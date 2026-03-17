@@ -1,0 +1,39 @@
+MiniOS Advanced Development Plan
+================================
+
+Goal
+----
+Build MiniOS into a complete custom OS stack with:
+- Custom bootloader pipeline (BIOS stage1 + stage2 + payload handoff)
+- 64-bit kernel with efficient event loop
+- Input drivers (keyboard + mouse)
+- Practical app runtime with isolated app services
+- Storage, memory, and process subsystems
+
+Phase 1: Boot Pipeline Status
+-----------------------------
+[Done]
+1) BIOS stage1 boot sector
+2) Stage2 direct payload loader + protected-mode handoff
+3) Unified BIOS image builder with payload placement metadata
+4) VirtualBox testing image pipeline
+
+Phase 2: Kernel Core
+--------------------
+[Done]
+1) Early memory manager foundation (bitmap frame allocator)
+
+[Done - foundation]
+2) Interrupt architecture baseline (IDT + PIC remap + PIT init)
+
+[In Progress]
+3) Scheduler/tasking
+
+Filesystem Status
+-----------------
+[Done]
+- RAMFS runtime FS
+- Persistent FS MVP via ATA-backed PFS record sector
+
+[Next]
+- Full FAT32/VFS layer
