@@ -1,0 +1,23 @@
+MiniOS Execution Plan (plan.txt)
+================================
+
+Completed in codebase
+---------------------
+[1] Stage1 custom BIOS boot sector.
+[2] Stage2 direct payload loading from disk and protected-mode handoff.
+[3] Unified BIOS image builder with payload metadata.
+[4] VirtualBox testing image target.
+[5] Memory manager foundation (bitmap frame allocator).
+[6] Interrupt foundation (IDT + PIC + PIT setup).
+[7] Drivers: keyboard + mouse.
+[8] Four interactive apps.
+[9] Filesystem layers:
+    - RAMFS (runtime)
+    - PFS (ATA-backed persistence record)
+
+Remaining
+---------
+[A] Real stage2 load of full kernel image and 64-bit jump for production BIOS path.
+[B] IRQ-driven input/timer handlers (replace polling loop timing).
+[C] FAT32 + VFS.
+[D] Scheduler + shell/file manager expansion.
