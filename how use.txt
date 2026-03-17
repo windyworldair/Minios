@@ -1,0 +1,21 @@
+MiniOS64 - How to Use
+=====================
+
+1) GRUB kernel route (main GUI):
+   - make run
+
+2) BIOS test route:
+   - make bios_test_image
+   - make vbox_test_image
+   - Use the produced .img/.vdi in VirtualBox for loader/payload validation.
+
+3) Drivers:
+   - PS/2 keyboard
+   - PS/2 mouse
+   - Framebuffer
+
+4) Apps:
+   - Notes, Tasks, Calculator, Status
+
+5) Persistence:
+   - Runtime RAMFS + ATA-backed PFS state record for notes/tasks
