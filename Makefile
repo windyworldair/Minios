@@ -15,9 +15,20 @@ ASM_SOURCES := $(SRC_DIR)/boot.s
 OBJECTS := $(BUILD_DIR)/kernel.o $(BUILD_DIR)/gfx.o $(BUILD_DIR)/apps.o $(BUILD_DIR)/keyboard.o $(BUILD_DIR)/mouse.o $(BUILD_DIR)/memory.o $(BUILD_DIR)/ramfs.o $(BUILD_DIR)/interrupts.o $(BUILD_DIR)/ata.o $(BUILD_DIR)/pfs.o $(BUILD_DIR)/boot.o
 KERNEL := $(BUILD_DIR)/kernel.elf
 
-.PHONY: all clean iso run
+.PHONY: all clean iso run check_toolchain
 
-all: $(KERNEL)
+all: check_toolchain $(KERNEL)
+
+
+check_toolchain:
+	@$(LD) -V 2>&1 | grep -q 'elf_x86_64' || ( \
+		echo "Error: current linker does not support ELF emulation (elf_x86_64)."; \
+		echo "Hint: Use Linux/WSL/Kali GNU binutils. MSYS2 MinGW ld only supports PE/COFF."; \
+		exit 1)
+	@$(LD) -V 2>&1 | grep -q 'elf_i386' || ( \
+		echo "Error: linker missing elf_i386 emulation required by BIOS targets."; \
+		echo "Hint: Install binutils in Linux/WSL/Kali and build from that shell."; \
+		exit 1)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -60,7 +71,7 @@ $(BUILD_DIR)/boot.o: $(SRC_DIR)/boot.s | $(BUILD_DIR)
 $(KERNEL): $(OBJECTS) linker.ld
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $@
 
-iso: $(KERNEL)
+iso: check_toolchain $(KERNEL)
 	mkdir -p $(BUILD_DIR)/iso/boot/grub
 	cp $(KERNEL) $(BUILD_DIR)/iso/boot/kernel.elf
 	printf 'set timeout=0\nset default=0\nmenuentry "MiniOS64" {\n  multiboot2 /boot/kernel.elf\n  boot\n}\n' > $(BUILD_DIR)/iso/boot/grub/grub.cfg
@@ -102,7 +113,7 @@ $(BOOT_BUILD)/stage2.bin: $(BOOT_BUILD)/stage2.elf
 	$(OBJCOPY) -O binary $< $@
 
 # Builds a custom BIOS boot path image independent from GRUB.
-bios_image: $(BOOT_BUILD)/stage1.bin $(BOOT_BUILD)/stage2.bin
+bios_image: check_toolchain $(BOOT_BUILD)/stage1.bin $(BOOT_BUILD)/stage2.bin
 	dd if=/dev/zero of=$(BUILD_DIR)/minios-bios.img bs=512 count=2880
 	dd if=$(BOOT_BUILD)/stage1.bin of=$(BUILD_DIR)/minios-bios.img conv=notrunc
 	dd if=$(BOOT_BUILD)/stage2.bin of=$(BUILD_DIR)/minios-bios.img bs=512 seek=1 conv=notrunc
@@ -115,7 +126,7 @@ bios_boot: bios_image
 .PHONY: bios_full_image
 
 # Unified BIOS image layout: stage1, stage2, then kernel payload sectors.
-bios_full_image: bios_image $(KERNEL)
+bios_full_image: check_toolchain bios_image $(KERNEL)
 	objcopy -O binary $(KERNEL) $(BUILD_DIR)/kernel_payload.bin
 	dd if=$(BUILD_DIR)/kernel_payload.bin of=$(BUILD_DIR)/minios-bios.img bs=512 seek=64 conv=notrunc
 	printf "stage1_lba=0\nstage2_lba=1\nkernel_lba=64\n" > $(BUILD_DIR)/bios_layout.txt
@@ -132,7 +143,7 @@ $(BOOT_BUILD)/test_payload.bin: $(BOOT_BUILD)/test_payload.elf
 
 .PHONY: bios_test_image vbox_test_image
 
-bios_test_image: bios_image $(BOOT_BUILD)/test_payload.bin
+bios_test_image: check_toolchain bios_image $(BOOT_BUILD)/test_payload.bin
 	dd if=$(BOOT_BUILD)/test_payload.bin of=$(BUILD_DIR)/minios-bios.img bs=512 seek=64 conv=notrunc
 	cp $(BUILD_DIR)/minios-bios.img $(BUILD_DIR)/minios-vbox-test.img
 

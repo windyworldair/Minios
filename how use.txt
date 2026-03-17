@@ -7,7 +7,8 @@ MiniOS64 - How to Use
 2) BIOS test route:
    - make bios_test_image
    - make vbox_test_image
-   - Use the produced .img/.vdi in VirtualBox for loader/payload validation.
+   - Use build/minios-vbox-test.img in VirtualBox.
+   - If VBoxManage exists, build/minios-vbox-test.vdi is generated.
 
 3) Drivers:
    - PS/2 keyboard
@@ -19,3 +20,16 @@ MiniOS64 - How to Use
 
 5) Persistence:
    - Runtime RAMFS + ATA-backed PFS state record for notes/tasks
+
+Environment notes:
+- Recommended build environment: Kali/Ubuntu/WSL Linux shell.
+- MSYS2/MinGW is not supported for low-level linker stages (`bios_*` targets).
+
+Input tips:
+- If your terminal executes lines like "Username:" or "remote:" as commands,
+  you likely pasted output logs back into the shell. Paste only actual commands.
+
+Boot troubleshooting:
+- For BIOS loader testing, run the image built by `make bios_test_image` (it contains a payload).
+- `make bios_image` alone only writes stage1/stage2 and is expected to show payload read failure.
+- Use `qemu-system-i386 -fda build/minios-bios.img -m 512` for BIOS path checks.

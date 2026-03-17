@@ -1,7 +1,16 @@
 MiniOS64 - How to Compile (Linux)
 =================================
 
-1) Install dependencies (Ubuntu/Debian):
+0) Clone repository (read-only clone is enough)
+   git clone https://github.com/windyworldair/Minios.git
+   cd Minios
+
+   If you see "Write access to repository not granted" while cloning,
+   remove saved credentials and clone again without push credentials:
+   git config --global --unset-all credential.helper
+   git clone https://github.com/windyworldair/Minios.git
+
+1) Install dependencies (Ubuntu/Debian/Kali):
    sudo apt update
    sudo apt install -y gcc binutils grub-pc-bin xorriso qemu-system-x86 make
 
@@ -18,3 +27,21 @@ MiniOS64 - How to Compile (Linux)
 
 5) Main run path:
    make run
+
+Troubleshooting
+---------------
+- If Kali/Ubuntu shows: "Temporary failure resolving 'http.kali.org'" during `apt update`, fix DNS first:
+  1) cat /etc/resolv.conf
+  2) echo -e "nameserver 1.1.1.1\nnameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+  3) sudo apt update
+
+- If building in MSYS2/MINGW fails with linker errors like:
+  "unrecognised emulation mode: elf_i386"
+  this environment is using a PE linker.
+  Build this project in Linux/WSL/Kali with GNU ELF binutils.
+
+- In terminals, copy only the command line (do not copy the shell prompt text).
+
+Quick BIOS run check:
+- Build a bootable BIOS test image with payload: `make bios_test_image`
+- Run it: `qemu-system-i386 -fda build/minios-bios.img -m 512`

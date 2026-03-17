@@ -1,6 +1,6 @@
 /*
  * File: stage1.s
- * Purpose: BIOS boot sector to load MiniOS stage2 from floppy sectors.
+ * Purpose: BIOS boot sector to load MiniOS stage2 from floppy sectors (with slack).
  * Author: zalcus, 2026
  */
 
@@ -40,7 +40,7 @@ load_stage2:
     xorw %bx, %bx
 
     movb $0x02, %ah
-    movb $0x08, %al
+    movb $0x10, %al
     movb $0x00, %ch
     movb $0x00, %dh
     movb $0x02, %cl
